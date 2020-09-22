@@ -11,11 +11,14 @@ pipeline {
             }
             steps {
                 echo 'Creating virtual environment'
-                sh 'echo Install awscli'
                 sh 'pip3 install awscli --user'
-                sh 'unzip -o ServerlessToDoListAPI.csar'
                 sh 'pip3 install boto3 ansible opera --user'
-                sh 'PATH="$(python3 -m site --user-base)/bin:${PATH}" && opera deploy $DEPLOY_FILE'
+                
+                sh 'pip list'
+
+                sh 'unzip -o ServerlessToDoListAPI.csar'
+                sh 'opera deploy _definitions/steIgeneral__cloudstash.tosca'
+
             }
         }
 
