@@ -15,6 +15,8 @@ pipeline {
                 sh 'pip3 install boto3 ansible opera --user'
                 
                 sh 'pip list'
+                echo 'gia na doume....'
+                sh 'PATH="$(python3 -m site --user-base)/bin:${PATH}" && pip list'
 
                 sh 'unzip -o ServerlessToDoListAPI.csar'
                 sh 'opera deploy _definitions/steIgeneral__cloudstash.tosca'
