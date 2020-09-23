@@ -10,11 +10,13 @@ pipeline {
                 DEPLOY_FILE = '_definitions/radonblueprints__ServerlessToDoListAPI.tosca'
             }
             steps {
-                echo 'Creating virtual environment'
-                sh 'python3 -m venv .venv && . .venv/bin/activate && pip install boto3 botocore ansible opera --user && pip list'
-                sh 'pip list'
-                sh 'unzip -o cloudstash.csar'
-                sh 'opera deploy _definitions/steIgeneral__cloudstash.tosca'
+                withEnv(["HOME=${env.WORKSPACE}"]) {
+                    sh 'unzip -o ServerlessToDoListAPI.csar'
+                    sh 'pip3 list'
+                    sh 'cat /etc/*-release'
+                    sh 'pip3 install selinux awscli boto boto3 botocore ansible opera==0.5.9 --user'
+                    sh 'PATH=/usr/lib64/python3.6/site-packages:${PATH} && PATH="$(python3 -m site --user-base)/bin:${PATH}" && pip3 list && opera deploy $DEPLOY_FILE'
+                }
             }
         }
 
@@ -26,6 +28,11 @@ pipeline {
                 sh 'echo Testing functionality...'
                 sh 'echo BLOB'
             }
+        }
+    }
+    post { 
+        always { 
+            cleanWs()
         }
     }
 }
