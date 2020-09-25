@@ -7,11 +7,11 @@ pipeline {
     stages {
         stage('Deploy resources') {
             environment {
-                DEPLOY_FILE = '_definitions/steIgeneral__ThumbnailGen_CTT_testing_PRQ.tosca'
+                DEPLOY_FILE = '_definitions/steIgeneral__ThumbnailGen_pipeline_testing_PRQ.tosca'
             }
             steps {
                 withEnv(["HOME=${env.WORKSPACE}"]) {
-                    sh 'unzip -o ThumbnailGen_CTT_testing_PRQ.csar'
+                    sh 'unzip -o ThumbnailGen_pipeline_testing_PRQ.csar'
                     sh 'pip3 list'
                     sh 'cat /etc/*-release'
                     sh 'pip3 install awscli boto boto3 botocore ansible opera==0.5.9 --user'
