@@ -22,12 +22,11 @@ pipeline {
 
         stage('Test functionality') {
             environment {
-                 BLOB = 'blob'
+                 finish = 'Done!'
             }
             steps {
                 sh 'echo Testing functionality...'
-                sh 'echo BLOB'
-                sh 'DONE!'
+                sh 'echo $finish'
             }
         }
     }
