@@ -24,7 +24,7 @@ pipeline {
                 sh 'mkdir -p $PWD/tmp/radon && cp -r _definitions $PWD/tmp/radon/_definitions && cp main.cdl $PWD/tmp/radon'
                 sh 'ls $PWD/tmp/radon && ls $PWD/tmp/radon/_definitions'
                 sh 'docker run --rm -p 5000:5000 -v /tmp/radon:/tmp/radon marklawimperial/verification-tool'
-                sh ' curl -X POST -H "Content-type: application/json" http://localhost:5000/solve/ -d '{"path":"/tmp/radon/main.cdl"}' '
+                sh ' curl -X POST -H "Content-type: application/json" http://localhost:5000/solve/ -d "{"path":"/tmp/radon/main.cdl"}" '
             }
         }
         stage('Deploy model on cloud vendor') {
