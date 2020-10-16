@@ -25,6 +25,8 @@ pipeline {
                 sh 'git clone https://github.com/radon-h2020/radon-defect-prediction-api'
                 sh 'cd radon-defect-prediction-api && docker build -t radon-dp:latest .'
                 sh 'docker run --name "${DPT_DOCKER_NAME}" --rm -d -p 5000:5000 -v $PWD/tmp/radon:/tmp/radon/container radon-dp:latest'
+                sh 'sleep 5'
+                sh 'docker ps'
                 sh 'curl -X POST "http://localhost:5000/api/classification/classify" -H  "accept: */*" -H  "Content-Type: plain/text" -d "- host: all"'
                 sh 'docker stop ${DPT_DOCKER_NAME}'
             }
