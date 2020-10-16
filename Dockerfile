@@ -8,7 +8,7 @@ RUN pip install --upgrade pip \
   && pip install --index-url https://test.pypi.org/simple/ opera==0.6.2.dev7
 RUN apk del build-dependencies
 RUN pip list
-
+CMD tail -f /dev/null
 
 
 
