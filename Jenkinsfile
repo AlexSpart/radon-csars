@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Run VT') {
             environment {
-                DEPLOY_FILE = 'ServerlessToDoListAPI.csar'
+                DEPLOY_FILE = 'todolist-dev.csar'
                 VT_DOCKER_NAME = 'RadonVT'
                 VT_FILES_PATH = '{"path":"/tmp/radon/container/main.cdl"}'
             }
@@ -61,8 +61,6 @@ pipeline {
     }
     post { 
         always { 
-            sh 'docker stop $(docker ps -aq)'
-            sh 'docker rm $(docker ps -aq)'
             cleanWs()
         }
     }
