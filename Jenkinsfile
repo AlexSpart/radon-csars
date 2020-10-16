@@ -18,12 +18,13 @@ pipeline {
                 OPERA_DOCKER_NAME = 'prqCont'
             }
             steps {
-                withEnv(["HOME=${env.WORKSPACE}"]) {                    
+                withEnv(["HOME=${env.WORKSPACE}"]) {    
                     sh 'echo Starting container operaContainer...'
                     sh 'mkdir -p $PWD/tmp/radon && cp -r todolist-dev.csar $PWD/tmp/radon'
                     sh 'docker run --name ${OPERA_DOCKER_NAME} --rm -d -p 18080:18080 -v $PWD/tmp/radon:/tmp/radon/container -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" -e "CTT_FAAS_ENABLED=1" opera-deploy'
                     sh 'sleep 5'
-                    sh 'docker exec ${OPERA_DOCKER_NAME} sh -c "cd /tmp/radon/container && opera init todolist-dev.csar && opera deploy"'
+                    sh 'docker exec ${OPERA_DOCKER_NAME} sh -c "cd /tmp/radon/container && opera init todolist-dev.csar && opera deploy "'
+                    sh 'docker stop $OPERA_DOCKER_NAME'
                 }
     
             }
