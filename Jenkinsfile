@@ -12,43 +12,23 @@ pipeline {
                 }
             }
         }
-        stage('Run VT') {
+        stage('Run DPT') {
             environment {
                 DEPLOY_FILE = 'todolist-dev.csar'
-                VT_DOCKER_NAME = 'RadonVT'
-                VT_FILES_PATH = '{"path":"/tmp/radon/container/main.cdl"}'
+                DPT_DOCKER_NAME = 'RadonDPT'
+                DPT_FILES_PATH = '{"path":"/tmp/radon/container/main.cdl"}'
             }
             steps {
                 sh 'echo Start VT container and perform verify test...'
                 sh 'unzip -o ${DEPLOY_FILE}'
-                sh 'mkdir -p $PWD/tmp/radon && cp -r _definitions $PWD/tmp/radon/_definitions && cp main.cdl $PWD/tmp/radon'
-                sh 'docker run --name "${VT_DOCKER_NAME}" --rm -d -p 5000:5000 -v $PWD/tmp/radon:/tmp/radon/container marklawimperial/verification-tool'
-                sh 'sleep 5'
-                sh 'docker exec ${VT_DOCKER_NAME} sh -c "cd /tmp/radon/container && pwd && ls -al && cat main.cdl"'
-                sh 'curl -X POST -H "Content-type: application/json" http://localhost:5000/solve/ -d ${VT_FILES_PATH}'
-                sh 'docker stop ${VT_DOCKER_NAME}'
+                sh 'mkdir -p $PWD/tmp/radon && cp -r todolist-dev.csar $PWD/tmp/radon'
+                sh 'git clone https://github.com/radon-h2020/radon-defect-prediction-api'
+                sh 'cd radon-defect-prediction-api && docker build -t radon-dp:latest .'
+                sh 'docker run --name "${DPT_DOCKER_NAME}" --rm -d -p 5000:5000 -v $PWD/tmp/radon:/tmp/radon/container radon-dp:latest'
+                curl -X POST "http://localhost:5000/api/classification/classify" -H  "accept: */*" -H  "Content-Type: plain/text" -d "- host: all"
+                sh 'docker stop ${DPT_DOCKER_NAME}'
             }
         }
-        stage('Opera Deploy') {
-            environment {
-                DEPLOY_FILE = 'todolist-dev.csar'
-                OPERA_DOCKER_NAME = 'prqCont'
-            }
-            steps {
-                withEnv(["HOME=${env.WORKSPACE}"]) {  
-                    sh 'echo Creating image opera-deploy...'
-                    sh 'docker build --tag opera-deploy .'
-                    sh 'echo Starting container prqCont...'
-                    sh 'mkdir -p $PWD/tmp/radon && cp -r todolist-dev.csar $PWD/tmp/radon'
-                    sh 'docker run --name ${OPERA_DOCKER_NAME} --rm -d -p 18080:18080 -v $PWD/tmp/radon:/tmp/radon/container -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" -e "CTT_FAAS_ENABLED=1" opera-deploy'
-                    sh 'sleep 5'
-                    sh 'docker exec ${OPERA_DOCKER_NAME} sh -c "cd /tmp/radon/container && opera init todolist-dev.csar && opera deploy "'
-                    sh 'docker stop $OPERA_DOCKER_NAME'
-                }
-    
-            }
-        }
-
         stage('Test functionality') {
             environment {
                  finish = 'Done!'
