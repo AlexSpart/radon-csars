@@ -16,16 +16,16 @@ pipeline {
             environment {
                 DEPLOY_FILE = 'ServerlessToDoListAPI.csar'
                 VT_DOCKER_NAME = 'RadonVT'
-                VT_FILES_PATH = '{"path":"/tmp/radon/main.cdl"}'
+                VT_FILES_PATH = '{"path":"/tmp/radon/container/main.cdl"}'
             }
             steps {
                 sh 'echo Start VT container and perform verify test...'
                 sh 'unzip -o ${DEPLOY_FILE}'
                 sh 'mkdir -p $PWD/tmp/radon && cp -r _definitions $PWD/tmp/radon/_definitions && cp main.cdl $PWD/tmp/radon'
-                sh 'docker run --name "${VT_DOCKER_NAME}" --rm -d -p 5000:5000 -v $PWD/tmp/radon:/tmp/radon marklawimperial/verification-tool'
+                sh 'docker run --name "${VT_DOCKER_NAME}" --rm -d -p 5000:5000 -v $PWD/tmp/radon:/tmp/radon/container marklawimperial/verification-tool'
                 sh 'sleep 5'
-                sh 'docker exec RadonVT /bin/bash  && cd tmp/radon && ls -al && cat main.cdl'
-                sh 'docker ps && curl -X POST -H "Content-type: application/json" http://localhost:5000/solve/ -d ${VT_FILES_PATH}'
+                sh 'docker exec ${VT_DOCKER_NAME} sh -c "cd /tmp/radon/container && pwd && ls -al && cat main.cdl"'
+                sh 'curl -X POST -H "Content-type: application/json" http://localhost:5000/solve/ -d ${VT_FILES_PATH}'
                 sh 'docker stop ${VT_DOCKER_NAME}'
             }
         }
@@ -61,6 +61,8 @@ pipeline {
     }
     post { 
         always { 
+            sh 'docker stop $(docker ps -aq)'
+            sh 'docker rm $(docker ps -aq)'
             cleanWs()
         }
     }
