@@ -16,14 +16,15 @@ pipeline {
         stage('Deploy model on cloud vendor') {
             environment {
                 DEPLOY_FILE = 'todolist-dev.csar'
+                OPERA_DOCKER_NAME = 'OperaCont'
             }
             steps {
                 withEnv(["HOME=${env.WORKSPACE}"]) {                    
                     sh 'echo Starting container operaContainer...'
                     sh 'mkdir -p $PWD/tmp/radon && cp -r todolist-dev.csar $PWD/tmp/radon'
-                    sh 'docker run --name "OperaCont" --rm -d -p 18080:18080 -v $PWD/tmp/radon:/tmp/radon -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" -e "CTT_FAAS_ENABLED=1" operacontainer:1.0 '
-                    sh 'sleep 20'
-                    sh 'docker exec OperaCont /bin/bash  && cd tmp/radon && opera init $DEPLOY_FILE  && opera deploy'
+                    sh 'docker run --name ${OPERA_DOCKER_NAME} --rm -d -p 18080:18080 -v $PWD/tmp/radon:/tmp/radon -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" -e "CTT_FAAS_ENABLED=1" operacontainer:1.0 '
+                    sh 'sleep 5'
+                    sh 'docker exec ${OPERA_DOCKER_NAME} /bin/bash  && cd tmp/radon && opera init $DEPLOY_FILE  && opera deploy'
                 }
     
             }
