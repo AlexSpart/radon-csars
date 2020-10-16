@@ -8,7 +8,7 @@ pipeline {
         stage('Install dependacies') {
             steps {
                 withEnv(["HOME=${env.WORKSPACE}"]) {
-                    sh 'docker stop RadonVT || true'
+                    sh 'echo install any dependancies..'
                 }
             }
         }
@@ -19,14 +19,14 @@ pipeline {
                 VT_FILES_PATH = '{"path":"/tmp/radon/main.cdl"}'
             }
             steps {
-                sh 'echo Deploy topology usinh orchestrator opera...'
-                sh 'unzip -o &{DEPLOY_FILE}'
+                sh 'echo Start VT container and perform verify test...'
+                sh 'unzip -o ${DEPLOY_FILE}'
                 sh 'mkdir -p $PWD/tmp/radon && cp -r _definitions $PWD/tmp/radon/_definitions && cp main.cdl $PWD/tmp/radon'
                 sh 'docker run --name "${VT_DOCKER_NAME}" --rm -d -p 5000:5000 -v $PWD/tmp/radon:/tmp/radon marklawimperial/verification-tool'
                 sh 'sleep 5'
                 sh 'docker exec RadonVT /bin/bash  && cd tmp/radon && ls -al && cat main.cdl'
                 sh 'docker ps && curl -X POST -H "Content-type: application/json" http://localhost:5000/solve/ -d ${VT_FILES_PATH}'
-                sh 'docker stop &{VT_DOCKER_NAME}'
+                sh 'docker stop ${VT_DOCKER_NAME}'
             }
         }
         stage('Opera Deploy') {
