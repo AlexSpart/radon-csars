@@ -1,0 +1,4 @@
+---
+source_bucket_name: "radon-ctt-imageresize-source"
+target_bucket_name: "radon-ctt-imageresize-target"
+...
