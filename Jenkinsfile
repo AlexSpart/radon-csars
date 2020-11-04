@@ -21,7 +21,7 @@ pipeline {
                 sh 'echo Start DPT container and perform test...'
                 sh 'mkdir -p $PWD/radon-dpt && cp -r todolist-dev.csar $PWD/radon-dpt'
         
-                sh 'git clone https://github.com/radon-h2020/radon-defect-prediction-cli.git'
+                sh 'git clone https://github.com/radon-h2020/radon-defect-prediction-cli.git cd radon-defect-prediction-cli'
                 sh 'pip3 install -r requirements.txt --user && pip3 install .  --user'
                 sh 'pip3 list'
                 sh 'cd $PWD/radon-dpt && PATH="$(python3 -m site --user-base)/bin:${PATH}" && radon-defect-predictor download-model tosca github AlexSpart/radon-csars && radon-defect-predictor predict tosca $DEPLOY_FILE '
